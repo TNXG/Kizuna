@@ -15,8 +15,6 @@ onMounted(async () => {
   }
 });
 
-const copyrightText = computed(() => `© ${curYear} Kizuna ${backend_version.value}`);
-
 const sections = [
   {
     name: '主页',
@@ -69,7 +67,9 @@ const sections = [
         </div>
         <div class="text-center mt-4 text-sm lg:text-base">
           <div class="divider mb-2"></div>
-          {{ copyrightText }}
+          © {{ curYear }} <a
+            class="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500">Kizuna</a>
+          {{ backend_version }}
           <br>
           <p class="text-sm text-gray-700 dark:text-gray-300">
             Designed by <a href="https://github.com/TNXG/tnxg-homepage"

@@ -12,7 +12,6 @@ onMounted(() => {
   invoke('start');
   unlisten = listen('log-event', (event) => {
     logsStore.addLog(event.payload);
-    console.log('Received log-event:', event);
   });
 });
 

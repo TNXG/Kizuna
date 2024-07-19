@@ -34,6 +34,11 @@ pub fn main() {
     }
 
     tauri::Builder::default()
+        .setup(|app| {
+            let main_window = app.get_window("main").unwrap();
+            main_window.eval("navigator.language = 'zh-CN';").unwrap();
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             start,
             open_log_directory,
@@ -54,7 +59,7 @@ fn start(app_handle: tauri::AppHandle<Wry>) {
         let token = token.to_owned();
         loop {
             thread::sleep(report_time);
-            let (logdata, data, icon_base64, media_update) = report(&endpoint, &token);
+            let (logdata, data, icon_base64, _media_update) = report(&endpoint, &token);
             let home_event_data = serde_json::json!({
                 "data": data,
                 "icon": icon_base64,
@@ -112,22 +117,21 @@ fn report(
 }
 
 const DEFAULT_CONFIG: &str = r#"
-ServerConfig:
-  Endpoint: "apiurl" # https://api.example.com/api/v2/fn/ps/update
-  Token: "apikey" # 设置的key
-  ReportTime: "10" # 上报时间间隔，单位秒
-Rules: # 软件名的替换规则（
-  - MatchApplication: WeChat
-    Replace:
-      Application: 微信
-      Description: 一个小而美的办公软件
-  - MatchApplication: QQ
-    Replace:
-      Application: QQ
-      Description: 一个多功能的通讯软件
-  - MatchApplication: Netease Cloud Music
-    Replace:
-      Application: 网易云音乐
-      Description: 一个音乐播放和分享的平台
-
+server_config:
+  endpoint: "apiurl" # https://api.example.com/api/v2/fn/ps/update
+  token: "apikey" # 设置的key
+  report_time: 5 # 上报时间间隔，单位秒
+rules: # 软件名的替换规则
+  - match_application: WeChat
+    replace:
+      application: 微信
+      description: 一个小而美的办公软件
+  - match_application: QQ
+    replace:
+      application: QQ
+      description: 一个多功能的通讯软件
+  - match_application: Netease Cloud Music
+    replace:
+      application: 网易云音乐
+      description: 一个音乐播放和分享的平台
 "#;

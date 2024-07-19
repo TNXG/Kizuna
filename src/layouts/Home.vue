@@ -1,11 +1,10 @@
 <template>
-    <div class="flex items-center justify-center min-h-screen">
-        <div class="p-6 max-w-lg mx-auto bg-white shadow-lg rounded-lg">
+    <div class="flex items-center justify-center min-h-screen min-w-screen">
+        <div class="p-6 max-w-lg mx-auto bg-white shadow-lg rounded-lg min-w-[300px]">
             <div v-if="eventData" class="space-y-6">
                 <!-- 显示程序图标 -->
                 <div class="flex items-center space-x-4">
-                    <img :src="`data:image/png;base64,${eventData.icon}`" alt="Program Icon"
-                        class="w-16 h-16">
+                    <img :src="`data:image/png;base64,${eventData.icon}`" alt="Program Icon" class="w-16 h-16">
                     <div class="flex-1">
                         <h1 class="text-xl font-semibold text-gray-800">{{ eventData.data.window_name }}</h1>
                         <p class="text-lg font-medium text-gray-600">进程: {{ eventData.data.process }}</p>
@@ -30,23 +29,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { listen } from '@tauri-apps/api/event';
+import { useEventStore } from '@/stores/eventStore';
 
-let unlisten;
-const eventData = ref(null);
+const eventStore = useEventStore();
+const eventData = computed(() => eventStore.eventData);
 
 onMounted(async () => {
-    unlisten = await listen('home-event', (event) => {
-        console.log('接收到 home-event 事件:', event);
-        eventData.value = event.payload;
+    const unlisten = await listen('home-event', (event) => {
+        eventStore.setEventData(event.payload);
     });
-});
 
-onUnmounted(() => {
-    if (unlisten) {
-        unlisten();
-    }
+    onUnmounted(() => {
+        if (unlisten) {
+            unlisten();
+        }
+    });
 });
 
 function formatTimestamp(timestamp) {

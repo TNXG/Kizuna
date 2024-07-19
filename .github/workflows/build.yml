@@ -1,0 +1,49 @@
+name: Release # 工作流名称：Release
+on:
+  push:
+    tags:
+      - "v*" # 当推送的标签匹配 "v*" 时触发工作流
+  workflow_dispatch: # 手动触发工作流
+
+jobs:
+  release:
+    permissions:
+      contents: write # 设置权限为写入内容
+    strategy:
+      fail-fast: false # 如果一个作业失败，不会立即停止所有作业
+      matrix:
+        platform: [windows-latest] # 定义矩阵策略，平台为最新的 Windows
+    runs-on: ${{ matrix.platform }} # 在矩阵定义的平台上运行
+
+    steps:
+      - name: Checkout repository # 步骤名称：检出仓库
+        uses: actions/checkout@v3 # 使用 actions/checkout@v3 操作
+
+      - name: Rust setup # 步骤名称：设置 Rust
+        uses: dtolnay/rust-toolchain@stable # 使用 dtolnay/rust-toolchain@stable 操作
+
+      - name: Rust cache # 步骤名称：Rust 缓存
+        uses: swatinem/rust-cache@v2 # 使用 swatinem/rust-cache@v2 操作
+        with:
+          workspaces: "./src-tauri -> target" # 配置工作区路径
+
+      - name: Sync node version and setup cache # 步骤名称：同步 Node 版本并设置缓存
+        uses: actions/setup-node@v3 # 使用 actions/setup-node@v3 操作
+        with:
+          node-version: "lts/*" # 使用 LTS 版本的 Node.js
+          cache: "pnpm" # 设置缓存为 yarn，可以改为 npm 或 pnpm
+
+      - name: Install frontend dependencies # 步骤名称：安装前端依赖
+        # 如果没有配置 `beforeBuildCommand`，可能需要在这里构建前端
+        run: pnpm i # 运行 yarn install，可以改为 npm, yarn 或 pnpm
+
+      - name: Build the app # 步骤名称：构建应用
+        uses: tauri-apps/tauri-action@v0 # 使用 tauri-apps/tauri-action@v0 操作
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 设置环境变量 GITHUB_TOKEN
+        with:
+          tagName: ${{ github.ref_name }} # 使用触发工作流的标签名
+          releaseName: "__VERSION__" # 发布名称，__VERSION__ 会被应用版本替换
+          releaseBody: "Built by Github Action, Kizuna v__VERSION__ based on Tauri" # 发布说明
+          releaseDraft: true # 发布为草稿
+          prerelease: false # 不是预发布版本

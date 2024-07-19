@@ -31,7 +31,6 @@ jobs:
         uses: actions/setup-node@v3 # 使用 actions/setup-node@v3 操作
         with:
           node-version: "lts/*" # 使用 LTS 版本的 Node.js
-          cache: "pnpm" # 设置缓存为 pnpm
 
       - name: Install pnpm # 步骤名称：安装 pnpm
         run: npm install -g pnpm # 全局安装 pnpm

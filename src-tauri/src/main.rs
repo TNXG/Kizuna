@@ -1,43 +1,60 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
+mod libs;
 mod modules;
 
-use serde_json::Value;
-use std::collections::HashMap;
-use std::fs;
-use std::io::Write;
-use std::thread;
-use std::time::Duration;
+use libs::cache::create_cache_directory;
+use libs::commands::{get_version, open_log_directory, start};
+use libs::create_config::create_config_file;
+use libs::report::report;
 
-use modules::get_config::load_config;
-use modules::get_processes;
-use modules::get_smtc::get_media_info;
-use modules::icon_converter;
-use modules::logs;
-use modules::requests;
+use tauri::{
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+};
 
-use tauri::{Manager, Wry};
-
-const VERSION: &str = "0.0.4";
+const VERSION: &str = "0.0.1";
 
 pub fn main() {
-    if !fs::metadata(".\\cache\\").is_ok() {
-        fs::create_dir(".\\cache.\\").expect("Failed to create assets directory");
-    }
-
-    let config_file = "config.yml";
-    if !fs::metadata(config_file).is_ok() {
-        let mut file = fs::File::create(config_file).expect("Failed to create config.yml");
-        file.write_all(DEFAULT_CONFIG.as_bytes())
-            .expect("Failed to write to config.yml");
-    }
-
+    create_cache_directory().expect("Failed to create cache directory");
+    create_config_file("config.yml").expect("Failed to create config.yml");
+    let quit = CustomMenuItem::new("quit".to_string(), "退出");
+    let show = CustomMenuItem::new("show".to_string(), "显示");
+    let tray_menu = SystemTrayMenu::new()
+        .add_item(show)
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(quit);
+    let system_tray = SystemTray::new().with_menu(tray_menu);
     tauri::Builder::default()
         .setup(|app| {
             let main_window = app.get_window("main").unwrap();
             main_window.eval("navigator.language = 'zh-CN';").unwrap();
+            let main_window_clone = main_window.clone();
+            main_window.on_window_event(move |event| match event {
+                tauri::WindowEvent::CloseRequested { api, .. } => {
+                    api.prevent_close();
+                    main_window_clone.hide().unwrap();
+                }
+                _ => {}
+            });
             Ok(())
+        })
+        .system_tray(system_tray)
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                "quit" => {
+                    std::process::exit(0);
+                }
+                "show" => {
+                    let main_window = app.get_window("main").unwrap();
+                    main_window.show().unwrap();
+                    main_window.set_focus().unwrap();
+                }
+                _ => {}
+            },
+            SystemTrayEvent::LeftClick { .. } => {
+                let main_window = app.get_window("main").unwrap();
+                main_window.show().unwrap();
+                main_window.set_focus().unwrap();
+            }
+            _ => {}
         })
         .invoke_handler(tauri::generate_handler![
             start,
@@ -47,91 +64,3 @@ pub fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-#[tauri::command]
-fn start(app_handle: tauri::AppHandle<Wry>) {
-    let config = load_config();
-    let endpoint = config.server_config.endpoint.to_string();
-    let token = config.server_config.token.to_string();
-    let report_time = Duration::from_secs(config.server_config.report_time as u64);
-    thread::spawn(move || {
-        let endpoint = endpoint.to_owned();
-        let token = token.to_owned();
-        loop {
-            thread::sleep(report_time);
-            let (logdata, data, icon_base64, _media_update) = report(&endpoint, &token);
-            let home_event_data = serde_json::json!({
-                "data": data,
-                "icon": icon_base64,
-            });
-            app_handle.emit_all("home-event", home_event_data).unwrap();
-            app_handle.emit_all("log-event", logdata).unwrap();
-        }
-    });
-}
-#[tauri::command]
-fn open_log_directory() {
-    #[cfg(target_os = "windows")]
-    {
-        std::process::Command::new("explorer")
-            .arg(".\\logs\\")
-            .spawn()
-            .unwrap();
-    }
-}
-
-#[tauri::command]
-fn get_version() -> String {
-    return VERSION.to_string();
-}
-
-fn report(
-    endpoint: &str,
-    token: &str,
-) -> (
-    String,
-    HashMap<String, Value>,
-    Option<String>,
-    HashMap<String, String>,
-) {
-    let (process_name, window_name) = get_processes::get_window_info();
-
-    let process_name = get_processes::replacer(&process_name.replace(".exe", ""));
-    let icon = get_processes::get_window_icon(&window_name);
-    let (title, artist, source_app_name) = get_media_info();
-    let media_update = requests::build_media_update(&title, &artist, &source_app_name);
-    let mut update_data = requests::build_data(&process_name, media_update.clone(), token);
-    let logdata = logs::log_message(
-        "info",
-        requests::report(update_data.clone(), endpoint).as_str(),
-    );
-    update_data.remove("key");
-    // 添加 window_name
-    update_data.insert(
-        "window_name".to_string(),
-        serde_json::Value::String(window_name.trim_end_matches('\u{0000}').to_string()),
-    );
-    let _ = icon_converter::convert_hicon_to_png(icon, "cache/icon.png");
-    let icon_base64 = icon_converter::convert_png_to_base64("cache/icon.png");
-    (logdata, update_data, icon_base64, media_update)
-}
-
-const DEFAULT_CONFIG: &str = r#"
-server_config:
-  endpoint: "apiurl" # https://api.example.com/api/v2/fn/ps/update
-  token: "apikey" # 设置的key
-  report_time: 5 # 上报时间间隔，单位秒
-rules: # 软件名的替换规则
-  - match_application: WeChat
-    replace:
-      application: 微信
-      description: 一个小而美的办公软件
-  - match_application: QQ
-    replace:
-      application: QQ
-      description: 一个多功能的通讯软件
-  - match_application: Netease Cloud Music
-    replace:
-      application: 网易云音乐
-      description: 一个音乐播放和分享的平台
-"#;

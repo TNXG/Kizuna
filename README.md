@@ -18,24 +18,23 @@ Kizuna 是一个基于 Tauri 的桌面应用程序，使用 Rust + Vue 3 开发�
 1. **配置文件**：
    - 编辑 `config.yml` 文件，设置服务器端点和令牌。
 ```yaml
-ServerConfig:
-  Endpoint: "apiurl" # https://api.example.com/api/v2/fn/ps/update
-  Token: "apikey" # 设置的key
-  ReportTime: "10" # 上报时间间隔，单位秒
-Rules: # 软件名的替换规则
-  - MatchApplication: WeChat
-    Replace:
-      Application: 微信
-      Description: 一个小而美的办公软件
-  - MatchApplication: QQ
-    Replace:
-      Application: QQ
-      Description: 一个多功能的通讯软件
-  - MatchApplication: Netease Cloud Music
-    Replace:
-      Application: 网易云音乐
-      Description: 一个音乐播放和分享的平台
-
+server_config:
+  endpoint: "apiurl" # https://api.example.com/api/v2/fn/ps/update
+  token: "apikey" # 设置的key
+  report_time: 5 # 上报时间间隔，单位秒
+rules: # 软件名的替换规则
+  - match_application: WeChat
+    replace:
+      application: 微信
+      description: 一个小而美的办公软件
+  - match_application: QQ
+    replace:
+      application: QQ
+      description: 一个多功能的通讯软件
+  - match_application: Netease Cloud Music
+    replace:
+      application: 网易云音乐
+      description: 一个音乐播放和分享的平台
 ```
 2. **日志查看**：
    - 日志文件存储在 `logs` 目录下，每天生成一个日志文件。

@@ -24,6 +24,9 @@
         "height": 576
       }
     ],
+    "systemTray": {
+      "iconPath": "icons/icon.ico"
+    },
     "security": {
       "csp": null
     },

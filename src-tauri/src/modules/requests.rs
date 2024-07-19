@@ -54,7 +54,7 @@ pub fn report(update_data: HashMap<String, Value>, endpoint: &str) -> String {
         HeaderName::from_static("content-type"),
         HeaderValue::from_static("application/json"),
     );
-    headers.insert(HeaderName::from_static("user-agent"), HeaderValue::from_static("Mozilla/5.0 (Windows NT 10.0; Win64; x64; TokaiTeio) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.82 iykrzu/114.514"));
+    headers.insert(HeaderName::from_static("user-agent"), HeaderValue::from_static("Mozilla/5.0 (Windows NT 10.0; Win64; x64; TokaiTeio) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.1 Safari/537.36 Edg/114.0.1823.82 iykrzu/114.514"));
 
     // Extract media field from update_data if exists
     let media = update_data.get("media");

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { invoke } from '@tauri-apps/api/tauri';
+import { open } from '@tauri-apps/api/shell';
 import Avatar from './Avatar.vue';
 
 const curYear = new Date().getFullYear();
@@ -32,6 +33,10 @@ const sections = [
     path: '/setting/'
   }
 ];
+
+const openInBrowser = async (url) => {
+  await open(url);
+};
 </script>
 
 <template>
@@ -67,12 +72,12 @@ const sections = [
         </div>
         <div class="text-center mt-4 text-sm lg:text-base">
           <div class="divider mb-2"></div>
-          © {{ curYear }} <a
-            class="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500">Kizuna</a>
+          © {{ curYear }} <a class="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500"
+            href="javascript:void(0)" @click="openInBrowser('https://github.com/TNXG/Kizuna')">Kizuna</a>
           {{ backend_version }}
           <br>
           <p class="text-sm text-gray-700 dark:text-gray-300">
-            Designed by <a href="https://github.com/TNXG/tnxg-homepage"
+            Designed by <a href="javascript:void(0)" @click="openInBrowser('https://github.com/TNXG/tnxg-homepage')"
               class="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-500">tnxg-homepage</a>
           </p>
         </div>

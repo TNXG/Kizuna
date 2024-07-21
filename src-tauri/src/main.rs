@@ -4,7 +4,7 @@ mod libs;
 mod modules;
 
 use libs::cache::create_cache_directory;
-use libs::commands::{get_version, open_log_directory, start};
+use libs::commands::{get_config, get_version, open_log_directory, save_config, start};
 use libs::create_config::create_config_file;
 use libs::report::report;
 
@@ -61,7 +61,9 @@ pub fn main() {
         .invoke_handler(tauri::generate_handler![
             start,
             open_log_directory,
-            get_version
+            get_version,
+            save_config,
+            get_config
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,4 +1,5 @@
 use tauri::{AppHandle, Manager, Wry};
+use crate::modules::get_config::MainConfig; // 添加导入语句
 
 #[tauri::command]
 pub fn start(app_handle: AppHandle<Wry>) {
@@ -38,6 +39,20 @@ pub fn open_log_directory() {
             eprintln!("Failed to open log directory: {}", e);
         }
     }
+}
+
+#[tauri::command]
+pub fn save_config(config: String) {
+    let config: MainConfig = serde_json::from_str(&config).unwrap();
+    let config_path = std::env::current_dir().unwrap().join("config.yml");
+    let config_data = serde_yaml::to_string(&config).unwrap();
+    std::fs::write(config_path, config_data).unwrap();
+}
+
+#[tauri::command]
+pub fn get_config() -> String {
+    let config = crate::modules::get_config::load_config();
+    serde_json::to_string(&config).unwrap()
 }
 
 #[tauri::command]

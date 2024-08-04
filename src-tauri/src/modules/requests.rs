@@ -2,7 +2,7 @@ use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde_json::{to_value, Value};
 use std::collections::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub fn build_media_update(
     title: &str,
@@ -45,16 +45,23 @@ pub fn build_data(
 }
 
 pub fn report(update_data: HashMap<String, Value>, endpoint: &str) -> String {
+
     let client = Client::builder()
         .timeout(Duration::from_secs(8))
+        .danger_accept_invalid_certs(true) // 忽略证书验证
         .build()
         .expect("Failed to build client");
+
     let mut headers = HeaderMap::new();
     headers.insert(
         HeaderName::from_static("content-type"),
         HeaderValue::from_static("application/json"),
     );
-    headers.insert(HeaderName::from_static("user-agent"), HeaderValue::from_static("Mozilla/5.0 (Windows NT 10.0; Win64; x64; TokaiTeio) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.1 Safari/537.36 Edg/114.0.1823.82 iykrzu/114.514"));
+    
+    headers.insert(
+        HeaderName::from_static("user-agent"),
+        HeaderValue::from_static("Mozilla/5.0 (Windows NT 10.0; Win64; x64; TokaiTeio) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.1 Safari/537.36 Edg/114.0.1823.82 iykrzu/114.514"),
+    );
 
     // Extract media field from update_data if exists
     let media = update_data.get("media");
@@ -77,6 +84,6 @@ pub fn report(update_data: HashMap<String, Value>, endpoint: &str) -> String {
             }
             Err(e) => return format!("解析响应时出错：{}", e),
         },
-        Err(e) => return format!("发送请求时出错：{}", e),
+        Err(e) => return format!("发送请求时出错：{}，详细信息：{:?}", e, e),
     }
 }

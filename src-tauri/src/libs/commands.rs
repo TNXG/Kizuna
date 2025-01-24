@@ -1,5 +1,7 @@
-use tauri::{AppHandle, Manager, Wry};
-use crate::modules::get_config::MainConfig; // 添加导入语句
+use tauri::{AppHandle, Wry};
+use tauri::Emitter;
+use crate::modules::get_config::MainConfig;
+use crate::libs::report;
 
 #[tauri::command]
 pub fn start(app_handle: AppHandle<Wry>) {
@@ -10,18 +12,18 @@ pub fn start(app_handle: AppHandle<Wry>) {
 
     std::thread::spawn(move || loop {
         std::thread::sleep(report_time);
-        let (logdata, data, icon_base64, _media_update) = crate::report(&endpoint, &token);
+        let (logdata, data, icon_base64, _media_update) = report::report(&endpoint, &token);
         let home_event_data = serde_json::json!({
             "data": data,
             "icon": icon_base64,
         });
         app_handle
-            .emit_all("home-event", home_event_data)
+            .emit("home-event", home_event_data)
             .unwrap_or_else(|e| {
                 eprintln!("Failed to emit home-event: {}", e);
             });
         app_handle
-            .emit_all("log-event", logdata)
+            .emit("log-event", logdata)
             .unwrap_or_else(|e| {
                 eprintln!("Failed to emit log-event: {}", e);
             });

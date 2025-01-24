@@ -29,7 +29,11 @@ pub struct MainConfig {
 
 pub fn load_config() -> MainConfig {
     let workdir = std::env::current_dir().unwrap();
-    let config_path = workdir.join("config.yml");
+    let config_path = if cfg!(dev) {
+        workdir.join("../config.yml")
+    } else {
+        workdir.join("config.yml")
+    };
     let data = fs::read_to_string(&config_path).unwrap_or_else(|err| {
         eprintln!("error: {}", err);
         exit(1);

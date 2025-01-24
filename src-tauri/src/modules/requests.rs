@@ -63,7 +63,7 @@ pub fn report(update_data: HashMap<String, Value>, endpoint: &str) -> String {
         HeaderValue::from_static("Mozilla/5.0 (Windows NT 10.0; Win64; x64; TokaiTeio) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.1 Safari/537.36 Edg/114.0.1823.82 iykrzu/114.514"),
     );
 
-    // Extract media field from update_data if exists
+    // 从update_data中提取媒体字段（如果存在）
     let media = update_data.get("media");
 
     let response = client
@@ -75,11 +75,11 @@ pub fn report(update_data: HashMap<String, Value>, endpoint: &str) -> String {
     match response {
         Ok(resp) => match resp.json::<HashMap<String, Value>>() {
             Ok(mut json) => {
-                // Print the media field if it exists
+                // 打印媒体字段（如果存在）
                 if let Some(media_value) = media {
                     json.insert("media".to_string(), media_value.clone());
                 }
-                // Print the final JSON response
+                // 打印最终的JSON响应
                 return format!("API 响应：{:?}", json);
             }
             Err(e) => return format!("解析响应时出错：{}", e),

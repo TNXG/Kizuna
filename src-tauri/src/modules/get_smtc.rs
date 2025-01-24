@@ -27,7 +27,6 @@ async fn async_main() -> Result<(String, String, String)> {
     let artist_hstring: HSTRING = media_properties.Artist()?.into();
 
     // 使用HSTRING类型的变量
-
     Ok((
         title_hstring.to_string_lossy().to_owned(),
         artist_hstring.to_string_lossy().to_owned(),

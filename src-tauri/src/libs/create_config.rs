@@ -21,10 +21,18 @@ rules: # 软件名的替换规则
       description: 一个音乐播放和分享的平台
 "#;
 
-pub fn create_config_file(config_file: &str) -> std::io::Result<()> {
-    if !fs::metadata(config_file).is_ok() {
-        let mut file = fs::File::create(config_file)?;
+pub fn create_config_file() -> std::io::Result<()> {
+    let config_file = if cfg!(dev) {
+        format!("..\\config.yml")
+    } else {
+        "config.yml".to_string()
+    };
+    
+    // 检查文件是否存在
+    if !fs::metadata(&config_file).is_ok() {
+        let mut file = fs::File::create(&config_file)?;
         file.write_all(DEFAULT_CONFIG.as_bytes())?;
     }
+    
     Ok(())
 }

@@ -1,49 +1,35 @@
 {
-  "build": {
-    "beforeDevCommand": "pnpm dev",
-    "beforeBuildCommand": "pnpm build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
-  },
-  "package": {
-    "productName": "Kizuna",
-    "version": "0.0.1"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "dialog": {
-        "all": true
-      }
-    },
-    "windows": [
-      {
-        "title": "Kizuna",
-        "width": 1024,
-        "height": 576
-      }
-    ],
-    "systemTray": {
-      "iconPath": "icons/icon.ico"
-    },
-    "security": {
-      "csp": null
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "top.tnxg.kizuna",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
-    }
-  }
+	"$schema": "https://schema.tauri.app/config/2",
+	"productName": "kizuna",
+	"version": "0.0.2",
+	"identifier": "top.yumehoxi.kizuna",
+	"build": {
+		"beforeDevCommand": "pnpm dev",
+		"beforeBuildCommand": "pnpm generate",
+		"devUrl": "http://localhost:3000",
+		"frontendDist": "../dist"
+	},
+	"app": {
+		"windows": [
+			{
+				"title": "Kizuna",
+				"width": 1024,
+				"height": 576
+			}
+		],
+		"security": {
+			"csp": null
+		}
+	},
+	"bundle": {
+		"active": true,
+		"targets": "all",
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		]
+	}
 }

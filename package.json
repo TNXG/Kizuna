@@ -1,28 +1,39 @@
 {
-  "name": "kizuna",
-  "private": true,
-  "version": "0.0.1",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "tauri": "tauri"
-  },
-  "dependencies": {
-    "@iconify/vue": "^4.1.2",
-    "@tauri-apps/api": "^1",
-    "pinia": "^2.1.7",
-    "vue": "^3.3.4",
-    "vue-router": "^4.4.0"
-  },
-  "devDependencies": {
-    "@tauri-apps/cli": "^1",
-    "@vitejs/plugin-vue": "^5.0.5",
-    "autoprefixer": "^10.4.19",
-    "daisyui": "^4.12.10",
-    "postcss": "^8.4.39",
-    "tailwindcss": "^3.4.6",
-    "vite": "^5.3.1"
-  }
+	"name": "kizuna",
+	"type": "module",
+	"private": true,
+	"packageManager": "pnpm@10.0.0",
+	"scripts": {
+		"build": "nuxt build",
+		"dev": "nuxt dev",
+		"generate": "nuxt generate",
+		"preview": "nuxt preview",
+		"postinstall": "nuxt prepare",
+		"tauri": "tauri"
+	},
+	"dependencies": {
+		"@iconify/vue": "^4.3.0",
+		"@nuxt/icon": "1.10.3",
+		"@pinia/nuxt": "0.9.0",
+		"@tauri-apps/api": "^2.2.0",
+		"@tauri-apps/plugin-opener": "^2.2.5",
+		"@tauri-apps/plugin-shell": "^2.2.0",
+		"nuxt": "^3.15.2",
+		"pinia": "^2.3.1",
+		"vue": "3.5.13",
+		"vue-router": "4.5.0"
+	},
+	"devDependencies": {
+		"@antfu/eslint-config": "^3.16.0",
+		"@tauri-apps/cli": "^2",
+		"@types/node": "^22.10.9",
+		"autoprefixer": "^10.4.20",
+		"daisyui": "4.12.23",
+		"eslint": "^9.18.0",
+		"eslint-plugin-format": "^1.0.1",
+		"postcss": "^8.5.1",
+		"tailwindcss": "3.4.17",
+		"typescript": "5.7.3",
+		"vue-tsc": "^2.2.0"
+	}
 }

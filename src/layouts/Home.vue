@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { listen } from "@tauri-apps/api/event";
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useEventStore } from "../stores/eventStore";
 
 const eventStore = useEventStore();
 const eventData = computed(() => eventStore.eventData);
+const isLoading = ref(true);
 
 onMounted(async () => {
 	const unlisten = await listen("home-event", (event) => {
 		eventStore.setEventData(event.payload as ReturnData);
+		isLoading.value = false;
 	});
 
 	onUnmounted(() => {
@@ -27,7 +29,20 @@ function formatTimestamp(timestamp: number) {
 <template>
 	<div class="flex items-center justify-center min-h-screen min-w-screen">
 		<div class="p-6 max-w-lg mx-auto bg-white shadow-lg rounded-lg min-w-[300px]">
-			<div v-if="eventData" class="space-y-6">
+			<div v-if="isLoading" class="space-y-6">
+				<!-- 骨架屏占位 -->
+				<div class="flex items-center space-x-4">
+					<div class="skeleton w-16 h-16 rounded-full" />
+					<div class="flex-1">
+						<div class="skeleton w-3/4 h-6 mb-2" />
+						<div class="skeleton w-1/2 h-4" />
+					</div>
+				</div>
+				<div class="border-t border-gray-200 pt-4">
+					<div class="skeleton w-1/2 h-4" />
+				</div>
+			</div>
+			<div v-else class="space-y-6">
 				<!-- 显示程序图标 -->
 				<div class="flex items-center space-x-4">
 					<img :src="`data:image/png;base64,${eventData.icon}`" alt="Program Icon" class="w-16 h-16">

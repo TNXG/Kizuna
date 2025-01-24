@@ -23,6 +23,6 @@ logs
 .env.*
 !.env.example
 
-logs
+# kizuna
 cache
 config.yml

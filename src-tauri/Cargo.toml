@@ -21,6 +21,14 @@ crate-type = [
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
+[profile.release]
+codegen-units = 1 # Allows LLVM to perform better optimization.
+lto = true # Enables link-time-optimizations.
+opt-level = "s" # Prioritizes small binary size. Use `3` if you prefer speed.
+panic = "abort" # Higher performance by disabling panic handlers.
+strip = true # Ensures debug symbols are removed.
+
+
 [dependencies]
 tauri = { version = "2", features = [ "tray-icon" ] }
 tauri-plugin-opener = "2"

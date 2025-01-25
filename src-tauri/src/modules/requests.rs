@@ -8,11 +8,15 @@ pub fn build_media_update(
     title: &str,
     artist: &str,
     source_app_name: &str,
+    album_title: &str,
+    album_artist: &str,
 ) -> HashMap<String, String> {
     let mut media_update = HashMap::new();
     media_update.insert("title".to_string(), title.to_string());
     media_update.insert("artist".to_string(), artist.to_string());
     media_update.insert("SourceAppName".to_string(), source_app_name.to_string());
+    media_update.insert("AlbumTitle".to_string(), album_title.to_string());
+    media_update.insert("AlbumArtist".to_string(), album_artist.to_string());
     media_update
 }
 

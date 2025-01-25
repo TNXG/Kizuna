@@ -26,7 +26,7 @@ const sections = [
 	{
 		name: "日志",
 		icon: "mingcute:align-left-line",
-		path: "/logs/",
+		path: "/log/",
 	},
 	{
 		name: "设置",

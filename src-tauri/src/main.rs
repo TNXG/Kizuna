@@ -11,7 +11,7 @@ use libs::create_config::create_config_file;
 use tauri::{
     Manager, 
     menu::{Menu, MenuItem},
-    tray::{TrayIconBuilder},
+    tray::TrayIconBuilder,
     WindowEvent,
 };
 

@@ -4,6 +4,8 @@ declare global {
 		title: string; // 媒体标题
 		artist: string; // 艺术家或创作者
 		SourceAppName: string; // 来源应用名称
+		AlbumTitle: string; // 专辑标题
+		AlbumArtist: string; // 专辑艺术家
 	}
 
 	// build_data 函数返回的数据结构
@@ -17,6 +19,7 @@ declare global {
 	interface ReturnData {
 		data: UpdateData;
 		icon?: string;
+		AlbumThumbnail?: string;
 	}
 }
 

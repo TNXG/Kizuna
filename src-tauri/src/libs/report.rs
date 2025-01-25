@@ -10,6 +10,7 @@ pub fn report(
     HashMap<String, Value>,
     Option<String>,
     HashMap<String, String>,
+    String,
 ) {
     // 从 get_processes 模块获取当前前台进程名称和窗口名称
     let (process_name, window_name) = crate::modules::get_processes::get_window_info();
@@ -21,11 +22,17 @@ pub fn report(
     let icon = crate::modules::get_processes::get_window_icon(&window_name);
 
     // 获取媒体信息
-    let (title, artist, source_app_name) = crate::modules::get_smtc::get_media_info();
+    let (title, artist, source_app_name, album_title, album_artist, album_thumbnail) =
+        crate::modules::get_smtc::get_media_info();
 
     // 构建媒体更新请求
-    let media_update =
-        crate::modules::requests::build_media_update(&title, &artist, &source_app_name);
+    let media_update = crate::modules::requests::build_media_update(
+        &title,
+        &artist,
+        &source_app_name,
+        &album_title,
+        &album_artist,
+    );
     // 将上一步的媒体信息同程序名构建请求数据
     let mut update_data =
         crate::modules::requests::build_data(&process_name, media_update.clone(), token);
@@ -58,5 +65,11 @@ pub fn report(
     let icon_base64 = crate::modules::icon_converter::convert_png_to_base64(
         &cache_file.to_str().unwrap_or_default(),
     );
-    (logdata, update_data, icon_base64, media_update)
+    (
+        logdata,
+        update_data,
+        icon_base64,
+        media_update,
+        album_thumbnail,
+    )
 }

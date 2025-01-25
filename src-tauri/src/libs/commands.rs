@@ -1,7 +1,7 @@
-use tauri::{AppHandle, Wry};
-use tauri::Emitter;
-use crate::modules::get_config::MainConfig;
 use crate::libs::report;
+use crate::modules::get_config::MainConfig;
+use tauri::Emitter;
+use tauri::{AppHandle, Wry};
 
 #[tauri::command]
 pub fn start(app_handle: AppHandle<Wry>) {
@@ -12,21 +12,21 @@ pub fn start(app_handle: AppHandle<Wry>) {
 
     std::thread::spawn(move || loop {
         std::thread::sleep(report_time);
-        let (logdata, data, icon_base64, _media_update) = report::report(&endpoint, &token);
+        let (logdata, data, icon_base64, _media_update, album_thumbnail) =
+            report::report(&endpoint, &token);
         let home_event_data = serde_json::json!({
             "data": data,
             "icon": icon_base64,
+            "AlbumThumbnail": album_thumbnail,
         });
         app_handle
             .emit("home-event", home_event_data)
             .unwrap_or_else(|e| {
                 eprintln!("Failed to emit home-event: {}", e);
             });
-        app_handle
-            .emit("log-event", logdata)
-            .unwrap_or_else(|e| {
-                eprintln!("Failed to emit log-event: {}", e);
-            });
+        app_handle.emit("log-event", logdata).unwrap_or_else(|e| {
+            eprintln!("Failed to emit log-event: {}", e);
+        });
     });
 }
 
@@ -46,7 +46,12 @@ pub fn open_log_directory() {
 #[tauri::command]
 pub fn save_config(config: String) {
     let config: MainConfig = serde_json::from_str(&config).unwrap();
-    let config_path = std::env::current_dir().unwrap().join("config.yml");
+    let config_path = std::env::current_dir().unwrap().join(
+    if cfg!(dev) {
+        "..\\config.yml"
+    } else {
+        "\\config.yml"
+    });
     let config_data = serde_yaml::to_string(&config).unwrap();
     std::fs::write(config_path, config_data).unwrap();
 }

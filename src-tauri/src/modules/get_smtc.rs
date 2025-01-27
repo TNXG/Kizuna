@@ -1,16 +1,20 @@
-use base64::Engine;
-use std::fs::File;
-use std::io::Write;
-use tokio::runtime::Runtime;
-use windows::core::Result;
-use windows::core::HSTRING;
-use windows::Foundation::IAsyncOperation;
-use windows::Media::Control::{
-    GlobalSystemMediaTransportControlsSessionManager,
-    GlobalSystemMediaTransportControlsSessionPlaybackInfo,
-};
-use windows::Storage::Streams::DataReader;
+#[cfg(target_os = "windows")]
+mod windows {
+    use base64::Engine;
+    use std::fs::File;
+    use std::io::Write;
+    use tokio::runtime::Runtime;
+    use windows::core::Result;
+    use windows::core::HSTRING;
+    use windows::Foundation::IAsyncOperation;
+    use windows::Media::Control::{
+        GlobalSystemMediaTransportControlsSessionManager,
+        GlobalSystemMediaTransportControlsSessionPlaybackInfo,
+    };
+    use windows::Storage::Streams::DataReader;
+}
 
+#[cfg(target_os = "windows")]
 pub fn get_media_info() -> (String, String, String, String, String, String) {
     let rt = Runtime::new().expect("Failed to create Tokio runtime");
 
@@ -30,14 +34,17 @@ pub fn get_media_info() -> (String, String, String, String, String, String) {
     }
 }
 
+#[cfg(target_os = "windows")]
 async fn async_main() -> Result<(String, String, String, String, String, String)> {
-    let session_manager_operation: IAsyncOperation<GlobalSystemMediaTransportControlsSessionManager> =
-        GlobalSystemMediaTransportControlsSessionManager::RequestAsync()?;
+    let session_manager_operation: IAsyncOperation<
+        GlobalSystemMediaTransportControlsSessionManager,
+    > = GlobalSystemMediaTransportControlsSessionManager::RequestAsync()?;
     let session_manager = session_manager_operation.get()?;
     let current_session = session_manager.GetCurrentSession()?;
 
     // 获取播放信息
-    let playback_info: GlobalSystemMediaTransportControlsSessionPlaybackInfo = current_session.GetPlaybackInfo()?;
+    let playback_info: GlobalSystemMediaTransportControlsSessionPlaybackInfo =
+        current_session.GetPlaybackInfo()?;
     let playback_status = playback_info.PlaybackStatus()?;
     // 检查播放状态，如果是暂停或其他非播放状态，返回空值
     if playback_status

@@ -8,7 +8,7 @@ use once_cell::sync::Lazy;
 static LOG_WRITER: Lazy<Mutex<BufWriter<std::fs::File>>> = Lazy::new(|| {
     let now = Local::now();
     let date_str = now.format("%Y-%m-%d").to_string();
-    let log_dir = if cfg!(dev) { "..\\logs" } else { "\\logs" };
+    let log_dir = if cfg!(dev) { "../logs" } else { "/logs" };
 
     if !Path::new(log_dir).exists() {
         create_dir_all(log_dir).expect("无法创建日志目录");
@@ -47,7 +47,7 @@ pub fn log_message(level: &str, message: &str) -> String {
 pub fn get_today_log() -> String {
     let now = Local::now();
     let date_str = now.format("%Y-%m-%d").to_string();
-    let log_dir = if cfg!(dev) { "..\\logs" } else { "\\logs" };
+    let log_dir = if cfg!(dev) { "../logs" } else { "/logs" };
     let log_file_path = format!("{}/{}.log", log_dir, date_str);
 
     if Path::new(&log_file_path).exists() {

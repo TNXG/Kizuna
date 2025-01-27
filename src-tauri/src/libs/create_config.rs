@@ -22,8 +22,10 @@ rules: # 软件名的替换规则
 "#;
 
 pub fn create_config_file() -> std::io::Result<()> {
+    use std::path::Path;
+
     let config_file = if cfg!(dev) {
-        format!("..\\config.yml")
+        Path::new("..").join("config.yml").to_str().unwrap().to_string()
     } else {
         "config.yml".to_string()
     };

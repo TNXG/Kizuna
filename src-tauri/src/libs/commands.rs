@@ -35,7 +35,7 @@ pub fn open_log_directory() {
     #[cfg(target_os = "windows")]
     {
         if let Err(e) = std::process::Command::new("explorer")
-            .arg(".\\logs\\")
+            .arg("./logs/")
             .spawn()
         {
             eprintln!("Failed to open log directory: {}", e);
@@ -48,9 +48,9 @@ pub fn save_config(config: String) {
     let config: MainConfig = serde_json::from_str(&config).unwrap();
     let config_path = std::env::current_dir().unwrap().join(
     if cfg!(dev) {
-        "..\\config.yml"
+        "../config.yml"
     } else {
-        "\\config.yml"
+        "/config.yml"
     });
     let config_data = serde_yaml::to_string(&config).unwrap();
     std::fs::write(config_path, config_data).unwrap();

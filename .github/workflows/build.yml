@@ -21,23 +21,38 @@ jobs:
 
       - name: Rust setup # 设置 Rust
         uses: dtolnay/rust-toolchain@stable
+      
+      - name: Node setup # 设置 Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22" # 使用 Node.js 18 版本
+
+      - name: Setup pnpm # 设置 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10 # 安装 pnpm 的特定版本
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install frontend dependencies # 安装前端依赖
+        run: pnpm install
 
       - name: Rust cache # Rust 缓存
         uses: swatinem/rust-cache@v2
         with:
           workspaces: "./src-tauri -> target"
-
-      - name: Sync node version and setup cache # 同步 Node 版本并设置缓存
-        uses: actions/setup-node@v3
-        with:
-          node-version: "lts/*"
-          cache: "pnpm"
-
-      - name: Install pnpm # 安装 pnpm
-        run: npm install -g pnpm
-
-      - name: Install frontend dependencies # 安装前端依赖
-        run: pnpm install
 
       - name: Cache Tauri build artifacts # 缓存 Tauri 构建工件
         uses: actions/cache@v3

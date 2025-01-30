@@ -28,6 +28,7 @@ pub fn report(
         &source_app_name,
         &album_title,
         &album_artist,
+        &album_thumbnail,
     );
     // 将上一步的媒体信息同程序名构建请求数据
     let mut update_data =
